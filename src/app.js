@@ -27,14 +27,42 @@ export default async function app(appDiv) {
   newUserFormEl.id = 'new-user-form';
   appDiv.append(newUserFormEl);
   // Render the form!
-  // renderNewUserForm;
+  renderNewUserForm(newUserFormEl);
 
   // Fetch the books!
-  // const books =
+  const books = await getFirstThreeFantasyBooks();
+  console.log(books)
   // render out the books
-  // renderBookList
+  renderBookList(bookListEl, books)
 
-  // bookListEl.addEventListener('???', () => {})
+  bookListEl.addEventListener('click', async (e) => {
+    if(e.target.matches('button')) {
+      const urlKey = e.target.dataset.authorUrlKey
+      const fetch = await getAuthor(urlKey)
 
-  // newUserFormEl.addEventListener('???', () => {})
+      renderAuthorInfo(authorInfoEl, fetch)
+    }
+  })
+
+  newUserFormEl.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const formData = new FormData(newUserFormEl)
+    console.log(formData)
+
+    const user = {
+      username: formData.get('username'),
+      isCool: formData.get('isCool') === 'on',
+      favoriteLanguage: formData.get('favoriteLanguage')
+    }
+    
+    const newUser = await createNewUser(user)
+
+    if(newUser) {
+      renderNewUser(newUserEl, newUser)
+      newUserFormEl.reset()
+    } else {
+      console.error('Failed to create user')
+    }
+
+  })
 }
